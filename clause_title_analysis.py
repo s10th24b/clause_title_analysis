@@ -1,5 +1,6 @@
 import time
 import os
+import platform
 import pickle
 import glob
 import re
@@ -11,17 +12,24 @@ import pandas as pd
 import re
 from konlpy.tag import Kkma, Okt, Komoran, Hannanum, Mecab #Twitter has changed to Okt
 pos_taggers = [('kkma', Kkma()), ('Okt', Okt()), ('Komoran', Komoran()),('Hannanum', Hannanum())]
+dir_splt = '/'
+if platform.system() == 'Windows':
+    dir_splt = '\\'
+else:
+    dir_splt = '/'
+print("Current System:",platform.system())
+print("dir_splt:",dir_splt)
 
 def make_clause_title_files(txt_files):
     process_time = time.time()
     print(len(txt_files),"files detected.")
 
     for idx,txt_file in enumerate(txt_files):
-        file_name = str(txt_file.split('/')[len(txt_file.split('/'))-1])
+        file_name = str(txt_file.split(dir_splt)[len(txt_file.split(dir_splt))-1])
         #print("txt_name:",file_name)
         with open(txt_file,'r',encoding='utf8') as rdata:
-            with open(clause_title_file_dir+'/'+file_name.split('.')[0]+'_clause_title'+'.txt','w',encoding='utf8') as wdata:
-                print(idx+1,"/",len(txt_files),"current_file:",txt_file)
+            with open(clause_title_file_dir+dir_splt+file_name.split('.')[0]+'_clause_title'+'.txt','w',encoding='utf8') as wdata:
+                print(idx+1,dir_splt,len(txt_files),"current_file:",txt_file)
                 lines = rdata.readlines()
                 for line in lines:
                     line = re.sub(u'\u201C','"',line) #left quotation mark
@@ -44,7 +52,7 @@ def make_clause_title_files(txt_files):
                             if mc is not None:
                                 #print("Main Clause Title:",mc)
                                 break
-    clause_title_files = glob.glob(clause_title_file_dir+'/*_clause_title.txt')
+    clause_title_files = glob.glob(clause_title_file_dir+dir_splt+'*_clause_title.txt')
     process_time = time.time() - process_time
     print('make_clause_files process done. %.3f' % (process_time))
     return clause_title_files
@@ -53,12 +61,12 @@ def sort_unique_values(clause_title_files):
     process_time = time.time()
     str_idx = 0
     clause_title_dic = dict()
-    with open(clause_title_file_dir+'/'+'clause_title_unique_values'+'.txt','w',encoding='utf8') as wdata:
+    with open(clause_title_file_dir+dir_splt+'clause_title_unique_values'+'.txt','w',encoding='utf8') as wdata:
         for idx,cl_title_file in enumerate(clause_title_files):
-            file_name = str(cl_title_file.split('/')[len(cl_title_file.split('/'))-1])
+            file_name = str(cl_title_file.split(dir_splt)[len(cl_title_file.split(dir_splt))-1])
             #print("clause_title_name:",file_name)
             with open(cl_title_file,'r',encoding='utf8') as rdata:
-                print(idx+1,"/",len(clause_title_files),"current_file:",cl_title_file)
+                print(idx+1,dir_splt,len(clause_title_files),"current_file:",cl_title_file)
                 lines = rdata.readlines()
                 for line in lines:
                     line = line.replace('"','')
@@ -102,10 +110,10 @@ def morphem_analysis(clause_title_files):
     clause_title_dic_name_list.append("Hannanum")
 
     for idx,cl_title_file in enumerate(clause_title_files):
-        file_name = str(cl_title_file.split('/')[len(cl_title_file.split('/'))-1])
+        file_name = str(cl_title_file.split(dir_splt)[len(cl_title_file.split(dir_splt))-1])
         #print("clause_title_name:",file_name)
         with open(cl_title_file,'r',encoding='utf8') as rdata:
-            print("\n",idx+1,"/",len(clause_title_files),"current_file:",cl_title_file,"\n")
+            print("\n",idx+1,dir_splt,len(clause_title_files),"current_file:",cl_title_file,"\n")
             lines = rdata.readlines()
             for line in lines:
                 if '"' in line:
@@ -153,7 +161,7 @@ def morphem_analysis(clause_title_files):
                         else:
                             current_dic[token] = 1
     for dic_idx,dic in enumerate(clause_title_dic_list):
-        with open(pickle_file_dir+'/'+'clause_title_token_dic_'+clause_title_dic_name_list[dic_idx]+'.pickle','wb') as handle:
+        with open(pickle_file_dir+dir_splt+'clause_title_token_dic_'+clause_title_dic_name_list[dic_idx]+'.pickle','wb') as handle:
             dic =sorted(dic.items(),key=lambda t : t[1])
             print("clause_title_token_dic_"+clause_title_dic_name_list[dic_idx]+":",len(dic), dic)
             pickle.dump(dic,handle,protocol=pickle.HIGHEST_PROTOCOL)
@@ -164,7 +172,7 @@ def morphem_analysis(clause_title_files):
 
 def visualize(clause_title_dic_list,clause_title_dic_name_list):
     # process_time = time.time()
-    font_name = font_manager.FontProperties(fname=font_dir+'/'+'NanumGothic.ttf').get_name()
+    font_name = font_manager.FontProperties(fname=font_dir+dir_splt+'NanumGothic.ttf').get_name()
     mpl.rcParams['axes.unicode_minus'] = False
     rc('font', family=font_name)
     for dic_idx,dic in enumerate(clause_title_dic_list):
@@ -176,7 +184,7 @@ def visualize(clause_title_dic_list,clause_title_dic_name_list):
         width = 10.0
         plt.bar(dic.keys(), dic.values(), width)
         plt.title(clause_title_dic_name_list[dic_idx])
-        plt.savefig(plot_file_dir+'/'+'fig_'+clause_title_dic_name_list[dic_idx]+'.png',dpi=500)
+        plt.savefig(plot_file_dir+dir_splt+'fig_'+clause_title_dic_name_list[dic_idx]+'.png',dpi=500)
         plt.show()
         
     # process_time = time.time() - process_time
@@ -186,12 +194,12 @@ if __name__ == "__main__":
     #directory setting
     currentdir = os.getcwd()
     parentdir = os.path.dirname(currentdir)
-    font_dir = currentdir+'/'+'Fonts'
-    txt_file_dir = currentdir+'/'+'Contract_Dataset'
-    txt_files = glob.glob(txt_file_dir+'/'+'*.txt')
-    clause_title_file_dir = currentdir+'/'+'Clause_title_Files'
-    pickle_file_dir = currentdir+'/'+'Pickle_Files'
-    plot_file_dir = currentdir+'/'+'Plot_Files'
+    font_dir = currentdir+dir_splt+'Fonts'
+    txt_file_dir = currentdir+dir_splt+'Contract_Dataset'
+    txt_files = glob.glob(txt_file_dir+dir_splt+'*.txt')
+    clause_title_file_dir = currentdir+dir_splt+'Clause_title_Files'
+    pickle_file_dir = currentdir+dir_splt+'Pickle_Files'
+    plot_file_dir = currentdir+dir_splt+'Plot_Files'
 
     if not(os.path.isdir(font_dir)):
         os.makedirs(os.path.join(font_dir))
@@ -203,7 +211,7 @@ if __name__ == "__main__":
         os.makedirs(os.path.join(plot_file_dir))
 
     clause_title_files = make_clause_title_files(txt_files)
-    #clause_title_files = glob.glob(clause_title_file_dir+'/*_clause_title.txt')
+    #clause_title_files = glob.glob(clause_title_file_dir+dir_splt+'*_clause_title.txt')
 
     clause_title_dic = sort_unique_values(clause_title_files)
 
