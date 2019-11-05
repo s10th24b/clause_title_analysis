@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib import font_manager,rc
 import pandas as pd
+import re
 from konlpy.tag import Kkma, Okt, Komoran, Hannanum, Mecab #Twitter has changed to Okt
 pos_taggers = [('kkma', Kkma()), ('Okt', Okt()), ('Komoran', Komoran()),('Hannanum', Hannanum())]
 
@@ -23,9 +24,9 @@ def make_clause_title_files(txt_files):
                 print(idx+1,"/",len(txt_files),"current_file:",txt_file)
                 lines = rdata.readlines()
                 for line in lines:
+                    line = re.sub(u'\u201C','"',line) #left quotation mark
+                    line = re.sub(u'\u201D','"',line) #right quotation mark
                     line = line.replace('"','')
-                    line = line.replace('u"\u201C"','')  #left quotation mark
-                    line = line.replace('u"\u201D"','')  #right quotation mark
                     line = line.strip()
                     regex = re.compile(r"^제\d+조\s{0,10}\((.{0,100})\)|^제\s{0,10}\d+조\s{0,10}\((.{0,100})\)|^제\d+\s{0,10}조\s{0,10}\((.{0,100})\)|^제\s{0,10}\d+\s{0,10}조\s{0,10}\((.{0,100})\)")
                     matchobj = regex.match(line)
@@ -185,12 +186,12 @@ if __name__ == "__main__":
     #directory setting
     currentdir = os.getcwd()
     parentdir = os.path.dirname(currentdir)
-    font_dir = currentdir+'/Fonts'
-    txt_file_dir = currentdir+'/'+"Contract_Dataset"
-    txt_files = glob.glob(txt_file_dir+'/*.txt')
-    clause_title_file_dir = currentdir+'/Clause_title_Files'
-    pickle_file_dir = currentdir+'/Pickle_Files'
-    plot_file_dir = currentdir+'/Plot_Files'
+    font_dir = currentdir+'/'+'Fonts'
+    txt_file_dir = currentdir+'/'+'Contract_Dataset'
+    txt_files = glob.glob(txt_file_dir+'/'+'*.txt')
+    clause_title_file_dir = currentdir+'/'+'Clause_title_Files'
+    pickle_file_dir = currentdir+'/'+'Pickle_Files'
+    plot_file_dir = currentdir+'/'+'Plot_Files'
 
     if not(os.path.isdir(font_dir)):
         os.makedirs(os.path.join(font_dir))
