@@ -197,7 +197,7 @@ if __name__ == "__main__":
     font_dir = currentdir+dir_splt+'Fonts'
     txt_file_dir = currentdir+dir_splt+'Contract_Dataset'
     txt_files = glob.glob(txt_file_dir+dir_splt+'*.txt')
-    clause_title_file_dir = currentdir+dir_splt+'Clause_title_Files'
+    clause_title_file_dir = currentdir+dir_splt+'Clause_Title_Files'
     pickle_file_dir = currentdir+dir_splt+'Pickle_Files'
     plot_file_dir = currentdir+dir_splt+'Plot_Files'
 
