@@ -172,7 +172,7 @@ def morphem_analysis(clause_title_files):
 
 def visualize(clause_title_dic_list,clause_title_dic_name_list):
     # process_time = time.time()
-    font_name = font_manager.FontProperties(fname=font_dir+dir_splt+'NanumGothic.ttf').get_name()
+    font_name = font_manager.FontProperties(fname=font_dir+dir_splt+'malgun.ttf').get_name()
     mpl.rcParams['axes.unicode_minus'] = False
     rc('font', family=font_name)
     for dic_idx,dic in enumerate(clause_title_dic_list):
